@@ -1,6 +1,6 @@
 /**
- * WordPress 2.8 Plugin: WP-EMail 2.50
- * Copyright (c) 2009 Lester "GaMerZ" Chan
+ * WordPress Plugin: WP-EMail
+ * Copyright (c) 2012 Lester "GaMerZ" Chan
  *
  * File Written By:
  * - Lester "GaMerZ" Chan
@@ -175,7 +175,7 @@ function email_form() {
 		email_pageid = jQuery('#page_id').val();
 	}
 	if(validate_email_form()) {
-		email_ajax_data = 'wp-email=1';
+		email_ajax_data = 'action=email';
 		jQuery('#wp-email-submit').attr('disabled', true);
 		jQuery('#wp-email-loading').show();
 		if(jQuery('#yourname').length) {
@@ -208,6 +208,7 @@ function email_form() {
 		if(jQuery('#page_id').length) {
 			email_ajax_data += '&page_id=' + email_pageid;
 		}
+		email_ajax_data += '&wp-email_nonce=' + jQuery('#wp-email_nonce').val();
 		jQuery.ajax({type: 'POST', url: emailL10n.ajax_url, data: email_ajax_data, cache: false, success: function (data) { jQuery('#wp-email-content').html(data);}});
 	}
 }

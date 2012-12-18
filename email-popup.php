@@ -1,7 +1,7 @@
 <?php
 /**
- * WordPress 2.8 Plugin: WP-EMail 2.50
- * Copyright (c) 2009 Lester "GaMerZ" Chan
+ * WordPress Plugin: WP-EMail
+ * Copyright (c) 2012 Lester "GaMerZ" Chan
  *
  * File Written By:
  * - Lester "GaMerZ" Chan
