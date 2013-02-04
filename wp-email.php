@@ -3,7 +3,7 @@
  * Plugin Name: WP-EMail
  * Plugin URI: http://lesterchan.net/portfolio/programming/php/
  * Description: Allows people to recommand/send your WordPress blog's post/page to a friend.
- * Version: 2.60
+ * Version: 2.61
  * Author: Lester 'GaMerZ' Chan
  * Author URI: http://lesterchan.net
  */
@@ -482,10 +482,8 @@ function email_content_alt() {
 ### Function: E-Mail Get The Content
 function get_email_content() {
 	global $pages, $multipage, $numpages, $post;
-	if (!empty($post->post_password)) {
-		if (stripslashes($_COOKIE['wp-postpass_'.COOKIEHASH]) != $post->post_password) {
-			return __('Password Protected Post', 'wp-email');
-		}
+	if(post_password_required()) {
+		return __('Password Protected Post', 'wp-email');
 	}
 	if($multipage) {
 		for($page = 0; $page < $numpages; $page++) {
@@ -522,19 +520,6 @@ function get_email_ipaddress() {
 	}
 	return esc_attr($ip_address);
 }
-
-
-### Function: Check For Password Protected Post
-function not_password_protected() {
-	global $post;
-	if (!empty($post->post_password)) {
-		if ($_COOKIE['wp-postpass_'.COOKIEHASH] != $post->post_password) {
-			return false;
-		}
-	}
-	return true;
-}
-
 
 ### Function: There Are Still Many PHP 4.x Users
 if(!function_exists('htmlspecialchars_decode')) {
@@ -760,22 +745,22 @@ if(!function_exists('get_emails_failed')) {
 }
 
 
-### Function: Get EMail Sent For Post 
-if(!function_exists('get_email_count')) { 
-	function get_email_count($post_id = 0, $echo = true) { 
-		global $wpdb; 
-		if($post_id == 0) { 
-			 global $post; 
-			$post_id = $post->ID; 
-		} 
-		$post_id = intval($post_id); 
-		$totalemails = $wpdb->get_var("SELECT COUNT(email_id) FROM $wpdb->email WHERE email_postid = $post_id"); 
-		if($echo) { 
-			echo number_format_i18n($totalemails); 
-		} else { 
-			return number_format_i18n($totalemails); 
-		} 
-	} 
+### Function: Get EMail Sent For Post
+if(!function_exists('get_email_count')) {
+	function get_email_count($post_id = 0, $echo = true) {
+		global $wpdb;
+		if($post_id == 0) {
+			 global $post;
+			$post_id = $post->ID;
+		}
+		$post_id = intval($post_id);
+		$totalemails = $wpdb->get_var("SELECT COUNT(email_id) FROM $wpdb->email WHERE email_postid = $post_id");
+		if($echo) {
+			echo number_format_i18n($totalemails);
+		} else {
+			return number_format_i18n($totalemails);
+		}
+	}
 }
 
 
@@ -846,7 +831,7 @@ function process_email_form() {
 			_e('Failed To Verify Referrer', 'wp-email');
 			exit();
 		}
-		
+
 		@session_start();
 		email_textdomain();
 		header('Content-Type: text/html; charset='.get_option('blog_charset').'');
@@ -861,9 +846,9 @@ function process_email_form() {
 		$page_id 		= (!empty($_POST['page_id'])	? intval($_POST['page_id']) : 0);
 		// Get Post Information
 		if($p > 0) {
-			$post_type = get_post_type($p); 
-	 		$query_post = 'p='. $p . '&post_type=' . $post_type; 
-			$id = $p; 
+			$post_type = get_post_type($p);
+	 		$query_post = 'p='. $p . '&post_type=' . $post_type;
+			$id = $p;
 		} else {
 			$query_post = 'page_id='.$page_id;
 			$id = $page_id;
@@ -1157,7 +1142,7 @@ function email_form($content, $echo = true, $subtitle = true, $div = true, $erro
 		$output .= '<div id="wp-email-content" class="wp-email">'."\n";
 	}
 	if (not_spamming()) {
-		if(not_password_protected()) {
+		if(!post_password_required()) {
 			if($email_type == 2){
 				$output .= email_popup_form_header(false, (!empty($error_field['id']) ? $error_field['id'] : 0));
 			} else {
@@ -1167,13 +1152,13 @@ function email_form($content, $echo = true, $subtitle = true, $div = true, $erro
 			if(intval($email_fields['yourname']) == 1) {
 				$output .= '<p>'."\n";
 				$output .= '<label for="yourname">'.__('Your Name: *', 'wp-email').'</label><br />'."\n";
-				$output .= '<input type="text" size="50" id="yourname" name="yourname" class="TextField" value="'.$error_field['yourname'].'" />'."\n";
+				$output .= '<input type="text" size="50" id="yourname" name="yourname" class="TextField" value="'.(!empty($error_field['yourname']) ? $error_field['yourname'] : '').'" />'."\n";
 				$output .= '</p>'."\n";
 			}
 			if(intval($email_fields['youremail']) == 1) {
 				$output .= '<p>'."\n";
 				$output .= '<label for="youremail">'.__('Your E-Mail: *', 'wp-email').'</label><br />'."\n";
-				$output .= '<input type="text" size="50" id="youremail" name="youremail" class="TextField" value="'.$error_field['youremail'].'" dir="ltr" />'."\n";
+				$output .= '<input type="text" size="50" id="youremail" name="youremail" class="TextField" value="'.(!empty($error_field['youremail']) ? $error_field['youremail'] : '').'" dir="ltr" />'."\n";
 				$output .= '</p>'."\n";
 			}
 			if(intval($email_fields['yourremarks']) == 1) {
@@ -1210,7 +1195,7 @@ function email_form($content, $echo = true, $subtitle = true, $div = true, $erro
 			$output .= '</form>'."\n";
 		} else {
 			$output .= get_the_password_form();
-		} // End if(not_password_protected())
+		} // End if(!post_password_required())
 	} else {
 		$output .= '<p>'.sprintf(_n('Please wait for <strong>%s Minute</strong> before sending the next article.', 'Please wait for <strong>%s Minutes</strong> before sending the next article.', email_flood_interval(false), 'wp-email'), email_flood_interval(false)).'</p>'."\n";
 	} // End if (not_spamming())
@@ -1265,15 +1250,15 @@ if($_GET['sortby'] == 'email') {
 
 
 ### Function: Plug Into WP-Stats
-add_action('wp','email_wp_stats'); 
-function email_wp_stats() { 
-	if(function_exists('stats_page')) { 
-		if(strpos(get_option('stats_url'), $_SERVER['REQUEST_URI']) || strpos($_SERVER['REQUEST_URI'], 'stats-options.php') || strpos($_SERVER['REQUEST_URI'], 'wp-stats/wp-stats.php')) { 
-			add_filter('wp_stats_page_admin_plugins', 'email_page_admin_general_stats'); 
-			add_filter('wp_stats_page_admin_most', 'email_page_admin_most_stats'); 
-			add_filter('wp_stats_page_plugins', 'email_page_general_stats'); 
-			add_filter('wp_stats_page_most', 'email_page_most_stats'); 
-		} 
+add_action('wp','email_wp_stats');
+function email_wp_stats() {
+	if(function_exists('stats_page')) {
+		if(strpos(get_option('stats_url'), $_SERVER['REQUEST_URI']) || strpos($_SERVER['REQUEST_URI'], 'stats-options.php') || strpos($_SERVER['REQUEST_URI'], 'wp-stats/wp-stats.php')) {
+			add_filter('wp_stats_page_admin_plugins', 'email_page_admin_general_stats');
+			add_filter('wp_stats_page_admin_most', 'email_page_admin_most_stats');
+			add_filter('wp_stats_page_plugins', 'email_page_general_stats');
+			add_filter('wp_stats_page_most', 'email_page_most_stats');
+		}
 	}
 }
 
