@@ -161,6 +161,9 @@ If you add a custom field with the key "wp-email-remark" it will be placed in th
 
 == Changelog ==
 
+= 2.61 =
+* FIXED: Unable to load WP-Email on Password Protected posts
+
 = 2.60 =
 * Move AJAX Request to wp-admin/admin-ajax.php
 * Added nonce To Email Form
