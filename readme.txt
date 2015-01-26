@@ -1,24 +1,28 @@
 === WP-EMail ===
-Contributors: GamerZ, aaroncampbell
-Donate link: http://lesterchan.net/site/donation/
-Tags: email, e-mail, wp-email, mail, send, recommend, ajax, friend
-Requires at least: 2.8
-Tested up to: 3.3.2
-Stable tag: trunk
+Contributors: GamerZ  
+Donate link: http://lesterchan.net/site/donation/  
+Tags: email, e-mail, wp-email, mail, send, recommend, ajax, friend  
+Requires at least: 3.9  
+Tested up to: 4.1  
+Stable tag: 2.65  
+License: GPLv2 or later  
 
 Allows people to recommend/send your WordPress blog's post/page to a friend.
 
 == Description ==
 
-Allows people to recommend/send your WordPress blog's post/page to a friend.
+= Build Status =
+[![Build Status](https://travis-ci.org/lesterchan/wp-email.svg?branch=master)](https://travis-ci.org/lesterchan/wp-email)
 
-[Demo](http://lesterchan.net/wordpress/2006/07/05/donations/email/ "Demo") | [Translations](http://dev.wp-plugins.org/browser/wp-email/i18n/ "Translations") | [Support Forums](http://forums.lesterchan.net/index.php?board=13.0 "WP-EMail Support Forums")
+= Development =
+* [https://github.com/lesterchan/wp-email](https://github.com/lesterchan/wp-email "https://github.com/lesterchan/wp-email")
+
+= Translations =
+* [http://dev.wp-plugins.org/browser/wp-email/i18n/](http://dev.wp-plugins.org/browser/wp-email/i18n/ "http://dev.wp-plugins.org/browser/wp-email/i18n/")
 
 = Credits =
+* Plugin icon by [Yannick](http://yanlu.de) from [Flaticon](http://www.flaticon.com)
 * Icons courtesy of [FamFamFam](http://www.famfamfam.com/).
-* __ngetext() by [Anna Ozeritskaya](http://hweia.ru/).
-* Right-to-left language support by [Kambiz R. Khojasteh](http://persian-programming.com/)
-* Maintenance by [AaronCampbell](http://xavisys.com)
 
 = Donations =
 I spent most of my free time creating, updating, maintaining and supporting these plugins, if you really love my plugins and could spare me a couple of bucks as my school allowance, I will really appericiate it. If not feel free to use it without any obligations. Thank You. My Paypal account is lesterchan@gmail.com.
@@ -34,40 +38,34 @@ Once installed take the following steps to set it up:
 
 1. Under E-Mail Settings, modify the setting Method Used To Send E-Mail accordingly. If the method is wrong, no email will get sent.
 1. You Need To Re-Generate The Permalink (WP-Admin -> Settings -> Permalinks -> Save Changes)
-1. Refer To Usage For Further Instructions
-
-= Usage =
-
-1. Open `wp-content/themes/<YOUR THEME NAME>/index.php`
-      You may place it in single.php, post.php, page.php, etc also.
-1. Find: `<?php while (have_posts()) : the_post(); ?>`
-1. Add Anywhere Below It: `<?php if(function_exists('wp_email')) { email_link(); } ?>`
+1. Open `wp-content/themes/<YOUR THEME NAME>/index.php` (You may place it in single.php, post.php, page.php, etc also)
+ * Find: `<?php while (have_posts()) : the_post(); ?>`
+ * Simply add this code inside the loop where you want the email link to display: <code>if(function_exists('email_link')) { email_link(); }</code>
 
 If you DO NOT want the email link to appear in every post/page, DO NOT use the code above. Just use the shortcode by typing [email_link] into the selected post/page content and it will embed the email link into that post/page only.
 
+== Upgrade Notice ==
+N/A
 
 == Screenshots ==
 
-1. Admin E-Mail logs
-2. Options/settings page
-3. Sample E-Mail Post link
-4. Sample E-Mail Post screen
+1. Admin - E-Mail Logs
+2. Admin - Options Page
+3. Admin - Templates Page
+4. Sample E-Mail Post link
+5. Sample E-Mail Post screen
 
 == Frequently Asked Questions ==
 
+= Does it support SMTP authentication with servers utilizing SSL encryption? =
+
+1. Yes. Go to `WP-Admin -> E-Mail -> Email Options`, under `SMTP Server`, use `ssl://smtp.gmail.com:465` if you are using Gmail SMTP.
+
 = How do I add this to my theme? =
 
-1. Open `wp-content/themes/<YOUR THEME NAME>/index.php`
-      You may place it in single.php, post.php, page.php, etc also.
+1. Open `wp-content/themes/<YOUR THEME NAME>/index.php` (You may place it in single.php, post.php, page.php, etc also)
 1. Find: `<?php while (have_posts()) : the_post(); ?>`
-1. Add Anywhere Below It: `<?php if(function_exists('wp_email')) { email_link(); } ?>`
-
-Simply add this code <strong>inside the loop</strong> where you want the email link to display:
-<code>
-if(function_exists('email_link')) {
-	email_link();
-}
-</code>
+1. Simply add this code <strong>inside the loop</strong> where you want the email link to display: <code>if(function_exists('email_link')) { email_link(); }</code>
 
 = How can I customize my E-Mail link? =
 
@@ -82,9 +80,9 @@ if(function_exists('email_link'))
 You can also force `email_link()` to return the link rather than echo it by setting the third parameter to false:
 <code>
 if(function_exists('email_link')) {
-	$email_link = email_link( 'E-Mail Text Link for Post', 'E-Mail Text Link for Page', false);
+	$email_link email_link( 'E-Mail Text Link for Post', 'E-Mail Text Link for Page', false);
 } else {
-	$email_link = '';
+	$email_link '';
 }
 
 echo $email_link;
@@ -160,6 +158,22 @@ If you add a custom field with the key "wp-email-title" it will be used as the E
 If you add a custom field with the key "wp-email-remark" it will be placed in the remarks field in the E-Mail form.
 
 == Changelog ==
+= 2.65 =
+* FIXED: Integration with WP-Stats
+* FIXED: Added in wp_nonce_field to email-options page
+
+= 2.64 =
+* NEW: Added in `wp_email_template_redirect` filter to allow other plugins disable template redirect when query var contains 'email'
+
+= 2.63 =
+* NEW: Finally there is custom post type support. Props [nimmolo](http://andrewnimmo.org/ "nimmolo").
+* NEW: Allow Multisite Network Activate
+* NEW: Uses WordPress uninstall.php file to uninstall the plugin
+* NEW: Added noindex, nofollow to meta tag to email-standalone.php
+* FIXED: Use get_the_author() instead of the_author('', false)
+
+= 2.62 =
+* NEW: WordPress 3.9 Dashicons
 
 = 2.61 =
 * FIXED: Unable to load WP-Email on Password Protected posts
